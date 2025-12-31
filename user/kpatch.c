@@ -55,12 +55,6 @@ void panic(const char *key)
     sc_panic(key);
 }
 
-int __test(const char *key)
-{
-    // return __sc_test(key, 0, 0, 0);
-    return 0;
-}
-
 extern const char program_name[];
 extern const char *key;
 

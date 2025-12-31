@@ -25,7 +25,6 @@ extern "C"
 
     void bootlog(const char *key);
     void panic(const char *key);
-    int __test(const char *key);
 
 #ifdef __cplusplus
 }

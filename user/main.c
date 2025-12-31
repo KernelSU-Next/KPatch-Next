@@ -15,13 +15,8 @@
 #include "../banner"
 #include "uapi/scdefs.h"
 #include "kpatch.h"
-#include "su.h"
 #include "kpm.h"
-
-#ifdef ANDROID
-#include "android/sumgr.h"
-#include "android/android_user.h"
-#endif
+#include "kpexclude.h"
 
 char program_name[128] = { '\0' };
 const char *key = NULL;
@@ -44,15 +39,13 @@ static void usage(int status)
         fprintf(stdout,
                 "\n"
                 "Commands:\n"
-                "hello       If KernelPatch installed, '%s' will echoed.\n"
-                "kpver       Print KernelPatch version.\n"
-                "kver        Print Kernel version.\n"
-                "key         Manager the superkey.\n"
-                "su          KernelPatch Substitute User.\n"
-                "kpm         KernelPatch Module manager.\n"
-#ifdef ANDROID
-                "sumgr       SU permission manager for Android.\n"
-#endif
+                "hello          If KernelPatch installed, '%s' will echoed.\n"
+                "kpver          Print KernelPatch version.\n"
+                "kver           Print Kernel version.\n"
+                "key            Manager the superkey.\n"
+                "kpm            KernelPatch Module manager.\n"
+                "exclude_set    Manage the exclude list.\n"
+                "exclude_get    Get exclude list status.\n"
                 "\n",
                 SUPERCALL_HELLO_ECHO);
     }
@@ -98,6 +91,8 @@ int main(int argc, char **argv)
         { "key", 'K' },
         { "su", 's' },
         { "kpm", 'k' },
+        { "exclude_set", 'e' },
+        { "exclude_get", 'g' },
 
         { "bootlog", 'l' },
         { "panic", '.' },
@@ -131,23 +126,23 @@ int main(int argc, char **argv)
     case SUPERCALL_KERNEL_VER:
         kv(key);
         return 0;
-    case 's':
-        strcat(program_name, " su");
-        return su_main(argc - 2, argv + 2);
     case 'K':
         strcat(program_name, " key");
         return skey_main(argc - 2, argv + 2);
     case 'k':
         strcat(program_name, " kpm");
         return kpm_main(argc - 2, argv + 2);
+    case 'e':
+        strcat(program_name, " exclude_set");
+        return kpexclude_set_main(argc - 3, argv + 3);
+    case 'g':
+        strcat(program_name, " exclude_get");
+        return kpexclude_get_main(argc - 3, argv + 3);
     case 'l':
         bootlog(key);
         break;
     case '.':
         panic(key);
-        break;
-    case 't':
-        __test(key);
         break;
 
     case 'h':
@@ -156,14 +151,6 @@ int main(int argc, char **argv)
     case 'v':
         fprintf(stdout, "%x\n", version());
         break;
-
-#ifdef ANDROID
-    case 'm':
-        strcat(program_name, " sumgr");
-        return sumgr_main(argc - 2, argv + 2);
-    case 'a':
-        return android_user(argc - 2, argv + 2);
-#endif
 
     default:
         fprintf(stderr, "Invalid command: %s!\n", scmd);
