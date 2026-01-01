@@ -14,8 +14,6 @@
 #define POLICYDB_STRING "SE Linux"
 
 #define POLICYDB_CONFIG_MLS 1
-#define POLICYDB_CONFIG_ANDROID_NETLINK_ROUTE (1 << 31)
-#define POLICYDB_CONFIG_ANDROID_NETLINK_GETNEIGH (1 << 30)
 
 /*
  * config offset:
@@ -33,8 +31,6 @@ struct _policy_file
 struct _policydb
 {
     int mls_enabled;
-    int android_netlink_route;
-    int android_netlink_getneigh;
 };
 
 #endif

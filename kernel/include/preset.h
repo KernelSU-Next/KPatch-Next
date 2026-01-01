@@ -25,7 +25,6 @@
 #define MAP_ALIGN 0x10
 
 #define CONFIG_DEBUG (1 << 0)
-#define CONFIG_ANDROID (1 << 1)
 
 #define MAP_SYMBOL_NUM (5)
 #define MAP_SYMBOL_SIZE (MAP_SYMBOL_NUM * 8)
@@ -149,14 +148,12 @@ typedef int32_t extra_item_type;
 #define EXTRA_TYPE_SHELL 2
 #define EXTRA_TYPE_EXEC 3
 #define EXTRA_TYPE_RAW 4
-#define EXTRA_TYPE_ANDROID_RC 5
 
 #define EXTRA_TYPE_NONE_STR "none"
 #define EXTRA_TYPE_KPM_STR "kpm"
 #define EXTRA_TYPE_SHELL_STR "shell"
 #define EXTRA_TYPE_EXEC_STR "exec"
 #define EXTRA_TYPE_RAW_STR "raw"
-#define EXTRA_TYPE_ANDROID_RC_STR "android_rc"
 
 // todo
 #define EXTRA_EVENT_PAGING_INIT "paging-init"

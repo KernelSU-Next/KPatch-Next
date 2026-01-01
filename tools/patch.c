@@ -98,8 +98,6 @@ int extra_str_type(const char *extra_str)
         extra_type = EXTRA_TYPE_SHELL;
     } else if (!strcmp(extra_str, EXTRA_TYPE_RAW_STR)) {
         extra_type = EXTRA_TYPE_RAW;
-    } else if (!strcmp(extra_str, EXTRA_TYPE_ANDROID_RC_STR)) {
-        extra_type = EXTRA_TYPE_ANDROID_RC;
     } else {
     }
     return extra_type;
@@ -116,8 +114,6 @@ const char *extra_type_str(extra_item_type extra_type)
         return EXTRA_TYPE_SHELL_STR;
     case EXTRA_TYPE_RAW:
         return EXTRA_TYPE_RAW_STR;
-    case EXTRA_TYPE_ANDROID_RC:
-        return EXTRA_TYPE_ANDROID_RC_STR;
     default:
         return EXTRA_TYPE_NONE_STR;
     }
