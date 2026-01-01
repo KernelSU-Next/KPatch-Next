@@ -149,8 +149,7 @@ static int get_cand_arr_symbol_offset_zero(kallsym_t *kallsym, char *img_buf, ch
     return offset;
 }
 
-int fillin_patch_config(kallsym_t *kallsym, char *img_buf, int imglen, patch_config_t *symbol, int32_t target_is_be,
-                        bool is_android)
+int fillin_patch_config(kallsym_t *kallsym, char *img_buf, int imglen, patch_config_t *symbol, int32_t target_is_be)
 {
     symbol->panic = get_symbol_offset_zero(kallsym, img_buf, "panic");
 
@@ -170,7 +169,7 @@ int fillin_patch_config(kallsym_t *kallsym, char *img_buf, int imglen, patch_con
 
     //  gcc -fipa-sra eg: avc_denied.isra.5
     symbol->avc_denied = try_get_symbol_offset_zero(kallsym, img_buf, "avc_denied");
-    if (!symbol->avc_denied && is_android) tools_loge_exit("no symbol avc_denied");
+    if (!symbol->avc_denied) tools_loge_exit("no symbol avc_denied");
 
     symbol->slow_avc_audit = try_get_symbol_offset_zero(kallsym, img_buf, "slow_avc_audit");
 

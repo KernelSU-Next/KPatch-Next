@@ -102,10 +102,6 @@ int main(int argc, char **argv)
         { "-h", 'h' },
         { "--version", 'v' },
         { "-v", 'v' },
-#ifdef ANDROID
-        { "sumgr", 'm' },
-        { "android_user", 'a' },
-#endif
     };
 
     for (int i = 0; i < sizeof(cmd_arr) / sizeof(cmd_arr[0]); i++) {
