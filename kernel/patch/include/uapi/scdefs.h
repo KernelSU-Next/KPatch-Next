@@ -15,7 +15,7 @@ static inline long hash_key(const char *key)
     return hash;
 }
 
-#define SUPERCALL_HELLO_ECHO "hello1158"
+#define SUPERCALL_HELLO_ECHO "hello2026"
 
 // #define __NR_supercall __NR3264_truncate // 45
 #define __NR_supercall 45
@@ -95,6 +95,6 @@ struct su_profile
 
 #define SUPERCALL_RES_SUCCEED 0
 
-#define SUPERCALL_HELLO_MAGIC 0x11581158
+#define SUPERCALL_HELLO_MAGIC 0x20262026
 
 #endif

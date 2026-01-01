@@ -29,7 +29,7 @@ static inline long hash_key_cmd(const char *key, long cmd)
 static inline long ver_and_cmd(const char *key, long cmd)
 {
     uint32_t version_code = (MAJOR << 16) + (MINOR << 8) + PATCH;
-    return ((long)version_code << 32) | (0x1158 << 16) | (cmd & 0xFFFF);
+    return ((long)version_code << 32) | (0x2026 << 16) | (cmd & 0xFFFF);
 }
 
 static inline long compact_cmd(const char *key, long cmd)

@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include <linux/err.h>
 
-#define TASK_EXT_MAGIC 0x11581158
+#define TASK_EXT_MAGIC 0x20262026
 
 /// @brief  the size of current struct task_ext, not included _magic
 extern int task_ext_size;

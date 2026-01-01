@@ -243,9 +243,9 @@ int resolve_cred_offset()
         if (is_bl(i)) continue;
         unsigned *sbitsp = (unsigned *)((uintptr_t)cred + i);
         unsigned oribits = *sbitsp;
-        *sbitsp = 1158;
+        *sbitsp = 2026;
         unsigned sbits = cap_task_prctl(PR_GET_SECUREBITS, 0, 0, 0, 0);
-        if (sbits != 1158) {
+        if (sbits != 2026) {
             *sbitsp = oribits;
             continue;
         }
@@ -261,14 +261,14 @@ int resolve_cred_offset()
         if (is_bl(i)) continue;
         uid_t *uidp = (uid_t *)((uintptr_t)cred + i);
         if (*uidp) continue;
-        *uidp = 1158;
-        if (raw_syscall0(__NR_geteuid) == 1158) {
+        *uidp = 2026;
+        if (raw_syscall0(__NR_geteuid) == 2026) {
             cred_offset.euid_offset = i;
-        } else if (raw_syscall0(__NR_getuid) == 1158) {
+        } else if (raw_syscall0(__NR_getuid) == 2026) {
             cred_offset.uid_offset = i;
-        } else if (raw_syscall0(__NR_getegid) == 1158) {
+        } else if (raw_syscall0(__NR_getegid) == 2026) {
             cred_offset.egid_offset = i;
-        } else if (raw_syscall0(__NR_getgid) == 1158) {
+        } else if (raw_syscall0(__NR_getgid) == 2026) {
             cred_offset.gid_offset = i;
         } else {
             *uidp = 0;
@@ -287,10 +287,10 @@ int resolve_cred_offset()
         if (is_bl(i)) continue;
         uid_t *uidp = (uid_t *)((uintptr_t)cred + i);
         uid_t backup = *uidp;
-        *uidp = 1158;
+        *uidp = 2026;
         uid_t old_uid = raw_syscall1(__NR_setfsuid, -1);
         *uidp = backup;
-        if (old_uid == 1158) {
+        if (old_uid == 2026) {
             cred_offset.fsuid_offset = i;
             add_bll(i, sizeof(uid_t));
             break;
@@ -304,10 +304,10 @@ int resolve_cred_offset()
         if (is_bl(i)) continue;
         gid_t *gidp = (gid_t *)((uintptr_t)new_cred + i);
         gid_t backup = *gidp;
-        *gidp = 1158;
+        *gidp = 2026;
         gid_t old_gid = raw_syscall1(__NR_setfsgid, -1);
         *gidp = backup;
-        if (old_gid == 1158) {
+        if (old_gid == 2026) {
             cred_offset.fsgid_offset = i;
             add_bll(i, sizeof(gid_t));
             break;
@@ -316,12 +316,12 @@ int resolve_cred_offset()
     log_boot("    fsgid offset: %x\n", cred_offset.fsgid_offset);
 
     // suid
-    raw_syscall3(__NR_setresuid, 0, 0, 1158);
+    raw_syscall3(__NR_setresuid, 0, 0, 2026);
     new_cred = *(struct cred **)((uintptr_t)task + task_struct_offset.cred_offset);
     for (int i = 0; i < CRED_MAX_SIZE; i += sizeof(uint32_t)) {
         if (is_bl(i)) continue;
         uid_t *uidp = (uid_t *)((uintptr_t)new_cred + i);
-        if (*uidp == 1158) {
+        if (*uidp == 2026) {
             cred_offset.suid_offset = i;
             *uidp = 0;
             add_bll(i, sizeof(uid_t));
@@ -331,12 +331,12 @@ int resolve_cred_offset()
     log_boot("    suid offset: %x\n", cred_offset.suid_offset);
 
     // sgid
-    raw_syscall3(__NR_setresgid, 0, 0, 1158);
+    raw_syscall3(__NR_setresgid, 0, 0, 2026);
     new_cred = *(struct cred **)((uintptr_t)task + task_struct_offset.cred_offset);
     for (int i = 0; i < CRED_MAX_SIZE; i += sizeof(uint32_t)) {
         if (is_bl(i)) continue;
         gid_t *uidp = (gid_t *)((uintptr_t)new_cred + i);
-        if (*uidp == 1158) {
+        if (*uidp == 2026) {
             cred_offset.sgid_offset = i;
             *uidp = 0;
             add_bll(i, sizeof(gid_t));
@@ -430,9 +430,9 @@ int resolve_task_offset()
             int *modep = (int *)i;
             int mode_back = *modep;
             if (mode_back) continue;
-            *modep = 1158;
+            *modep = 2026;
             int mode = prctl_get_seccomp();
-            if (mode == 1158) {
+            if (mode == 2026) {
                 task_struct_offset.seccomp_offset = i - (uintptr_t)task;
             }
             *modep = mode_back;
