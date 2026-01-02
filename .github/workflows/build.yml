@@ -18,10 +18,11 @@ jobs:
       - name: Generate version
         id: parse_version
         run: |
-          MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
-          MINOR=$(grep '#define MINOR' version | awk '{print $3}')
-          PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH"
+          MAJOR=$(grep '#define MAJOR' version_revision | awk '{print $3}')
+          MINOR=$(grep '#define MINOR' version_revision | awk '{print $3}')
+          PATCH=$(grep '#define PATCH' version_revision | awk '{print $3}')
+          REVISION=$(grep '#define REVISION' version_revision | awk '{print $3}')
+          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
           echo "Generated Version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
       - name: Install Compiler
@@ -85,10 +86,11 @@ jobs:
       - name: Generate version
         id: parse_version
         run: |
-          MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
-          MINOR=$(grep '#define MINOR' version | awk '{print $3}')
-          PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH"
+          MAJOR=$(grep '#define MAJOR' version_revision | awk '{print $3}')
+          MINOR=$(grep '#define MINOR' version_revision | awk '{print $3}')
+          PATCH=$(grep '#define PATCH' version_revision | awk '{print $3}')
+          REVISION=$(grep '#define REVISION' version_revision | awk '{print $3}')
+          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
           echo "Generated Version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
@@ -124,10 +126,11 @@ jobs:
       - name: Generate version
         id: parse_version
         run: |
-          MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
-          MINOR=$(grep '#define MINOR' version | awk '{print $3}')
-          PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH"
+          MAJOR=$(grep '#define MAJOR' version_revision | awk '{print $3}')
+          MINOR=$(grep '#define MINOR' version_revision | awk '{print $3}')
+          PATCH=$(grep '#define PATCH' version_revision | awk '{print $3}')
+          REVISION=$(grep '#define REVISION' version_revision | awk '{print $3}')
+          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
           echo "Generated Version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
@@ -178,10 +181,11 @@ jobs:
       - name: Generate version
         id: parse_version
         run: |
-          MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
-          MINOR=$(grep '#define MINOR' version | awk '{print $3}')
-          PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH"
+          MAJOR=$(grep '#define MAJOR' version_revision | awk '{print $3}')
+          MINOR=$(grep '#define MINOR' version_revision | awk '{print $3}')
+          PATCH=$(grep '#define PATCH' version_revision | awk '{print $3}')
+          REVISION=$(grep '#define REVISION' version_revision | awk '{print $3}')
+          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
           echo "Generated Version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
@@ -278,10 +282,11 @@ jobs:
       - name: Generate version
         id: parse_version
         run: |
-          MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
-          MINOR=$(grep '#define MINOR' version | awk '{print $3}')
-          PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH"
+          MAJOR=$(grep '#define MAJOR' version_revision | awk '{print $3}')
+          MINOR=$(grep '#define MINOR' version_revision | awk '{print $3}')
+          PATCH=$(grep '#define PATCH' version_revision | awk '{print $3}')
+          REVISION=$(grep '#define REVISION' version_revision | awk '{print $3}')
+          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
           echo "Generated Version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
@@ -321,10 +326,11 @@ jobs:
       - name: Generate version
         id: parse_version
         run: |
-          MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
-          MINOR=$(grep '#define MINOR' version | awk '{print $3}')
-          PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH"
+          MAJOR=$(grep '#define MAJOR' version_revision | awk '{print $3}')
+          MINOR=$(grep '#define MINOR' version_revision | awk '{print $3}')
+          PATCH=$(grep '#define PATCH' version_revision | awk '{print $3}')
+          REVISION=$(grep '#define REVISION' version_revision | awk '{print $3}')
+          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
           echo "Generated Version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
