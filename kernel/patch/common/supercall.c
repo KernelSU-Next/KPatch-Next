@@ -244,7 +244,11 @@ static long supercall(int is_key_auth, long cmd, long arg1, long arg2, long arg3
 }
 
 static void before(hook_fargs6_t *args, void *udata)
-{
+{   
+    // if (current_uid() != 0u) return; // only allow root
+
+    if (likely(get_ap_mod_exclude(current_uid()))) return; // don't let excluded uid pass
+
     const char *__user ukey = (const char *__user)syscall_argn(args, 0);
     long ver_xx_cmd = (long)syscall_argn(args, 1);
 
