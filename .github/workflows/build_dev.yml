@@ -27,7 +27,7 @@ jobs:
       contents: write
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -37,10 +37,17 @@ jobs:
           MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
           MINOR=$(grep '#define MINOR' version | awk '{print $3}')
           PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          REVISION=$(grep '#define REVISION' revision | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          REVISION=$(grep '#define REVISION' revision | awk '{print $3}' | tr -d '\r')
+
+          if [ "$REVISION" = "0" ]; then
+            VERSION="$MAJOR.$MINOR.$PATCH"
+          else
+            VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          fi
+
           echo "Generated Version: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Install Compiler
         run: |
           curl -o arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-elf.tar.xz https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-elf.tar.xz
@@ -71,17 +78,17 @@ jobs:
           mv syscallhook.kpm demo-syscallhook.kpm
 
       - name: Upload elf
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: |
             kernel/kpimg.elf-linux
           name: kpimg.elf
 
       - name: Release
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.parse_version.outputs.VERSION }}-dev
+          tag: ${{ steps.parse_version.outputs.VERSION }}
           artifacts: |
             kernel/kpimg-linux
             kpms/demo-hello/demo-hello.kpm
@@ -90,7 +97,6 @@ jobs:
           generateReleaseNotes: true
           allowUpdates: true
           replacesArtifacts: true
-          prerelease: true
 
   Release-user-lib:
     runs-on: ubuntu-latest
@@ -98,17 +104,23 @@ jobs:
       contents: write
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Generate version
         id: parse_version
         run: |
           MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
           MINOR=$(grep '#define MINOR' version | awk '{print $3}')
           PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          REVISION=$(grep '#define REVISION' revision | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          REVISION=$(grep '#define REVISION' revision | awk '{print $3}' | tr -d '\r')
+
+          if [ "$REVISION" = "0" ]; then
+            VERSION="$MAJOR.$MINOR.$PATCH"
+          else
+            VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          fi
+
           echo "Generated Version: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Zip-lib
         run: |
@@ -119,7 +131,7 @@ jobs:
           zip -r kpuser.zip user
 
       - name: Release
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.parse_version.outputs.VERSION }}-dev
@@ -135,7 +147,7 @@ jobs:
       contents: write
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -145,10 +157,16 @@ jobs:
           MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
           MINOR=$(grep '#define MINOR' version | awk '{print $3}')
           PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          REVISION=$(grep '#define REVISION' revision | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          REVISION=$(grep '#define REVISION' revision | awk '{print $3}' | tr -d '\r')
+
+          if [ "$REVISION" = "0" ]; then
+            VERSION="$MAJOR.$MINOR.$PATCH"
+          else
+            VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          fi
+
           echo "Generated Version: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1
@@ -177,7 +195,7 @@ jobs:
           mv kptools kptools-android
 
       - name: Release
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.parse_version.outputs.VERSION }}-dev
@@ -193,17 +211,23 @@ jobs:
       contents: write
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Generate version
         id: parse_version
         run: |
           MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
           MINOR=$(grep '#define MINOR' version | awk '{print $3}')
           PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          REVISION=$(grep '#define REVISION' revision | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          REVISION=$(grep '#define REVISION' revision | awk '{print $3}' | tr -d '\r')
+
+          if [ "$REVISION" = "0" ]; then
+            VERSION="$MAJOR.$MINOR.$PATCH"
+          else
+            VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          fi
+
           echo "Generated Version: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Make hdr
         run: |
@@ -220,54 +244,12 @@ jobs:
           mv kptools kptools-linux
 
       - name: Release
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.parse_version.outputs.VERSION }}-dev
           artifacts: |
             tools/build/kptools-linux
-          allowUpdates: true
-          replacesArtifacts: true
-          prerelease: true
-
-  Build-kptools-mac:
-    runs-on: macos-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Check out
-        uses: actions/checkout@v3
-      - name: Generate version
-        id: parse_version
-        run: |
-          MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
-          MINOR=$(grep '#define MINOR' version | awk '{print $3}')
-          PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          REVISION=$(grep '#define REVISION' revision | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
-          echo "Generated Version: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Make hdr
-        run: |
-          export TARGET_COMPILE=placeholder
-          cd kernel
-          make hdr
-
-      - name: Build kptools
-        run: |
-          cd tools
-          mkdir -p build && cd build
-          cmake ..
-          make
-          mv kptools kptools-mac
-      - name: Release
-        uses: ncipollo/release-action@v1.12.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.parse_version.outputs.VERSION }}-dev
-          artifacts: |
-            tools/build/kptools-mac
           allowUpdates: true
           replacesArtifacts: true
           prerelease: true
@@ -288,10 +270,16 @@ jobs:
           MAJOR=$(grep '#define MAJOR' version | awk '{print $3}')
           MINOR=$(grep '#define MINOR' version | awk '{print $3}')
           PATCH=$(grep '#define PATCH' version | awk '{print $3}')
-          REVISION=$(grep '#define REVISION' revision | awk '{print $3}')
-          VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          REVISION=$(grep '#define REVISION' revision | awk '{print $3}' | tr -d '\r')
+
+          if [ "$REVISION" = "0" ]; then
+            VERSION="$MAJOR.$MINOR.$PATCH"
+          else
+            VERSION="$MAJOR.$MINOR.$PATCH-$REVISION"
+          fi
+
           echo "Generated Version: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1
@@ -323,8 +311,9 @@ jobs:
         uses: ncipollo/release-action@v1.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.parse_version.outputs.VERSION }}
+          tag: ${{ steps.parse_version.outputs.VERSION }}-dev
           artifacts: |
             user/build/android/kpatch-android
           allowUpdates: true
           replacesArtifacts: true
+          prerelease: true
