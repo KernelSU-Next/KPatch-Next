@@ -45,6 +45,22 @@ long set_uid_exclude(uid_t uid, int exclude)
     if (exclude != 0 && exclude != 1)
         error(-EINVAL, 0, "exclude must be 0 or 1");
 
+    // Check current status
+    long current = sc_get_ap_mod_exclude(key, uid);
+    
+    // Normalize current to 0 or 1 (negative means not in list = 0)
+    int is_excluded = (current > 0) ? 1 : 0;
+
+    // Check if already in desired state
+    if (is_excluded == exclude) {
+        if (exclude) {
+            printf("UID %d is already in exclude list\n", uid);
+        } else {
+            printf("UID %d is already not in exclude list\n", uid);
+        }
+        return 0;
+    }
+
     long rc = sc_set_ap_mod_exclude(key, uid, exclude);
     if (rc < 0)
         return rc;

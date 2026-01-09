@@ -32,6 +32,7 @@
 #include <kpextension.h>
 #include <accctl.h>
 #include <kstorage.h>
+#include <rehook.h>
 
 #define MAX_KEY_LEN 128
 
@@ -236,6 +237,27 @@ static long supercall(int is_key_auth, long cmd, long arg1, long arg2, long arg3
     }
 
     switch (cmd) {
+    case SUPERCALL_MINIMAL_SYSCALL_HOOKS:
+        {
+            int enable = (int)arg1;
+            if (enable)
+                return minimal_hook_init();
+            else
+                return minimal_hook_exit();
+        }
+    case SUPERCALL_TARGET_SYSCALL_HOOKS:
+        {
+            int enable = (int)arg1;
+            if (enable)
+                return target_hook_init();
+            else
+                return target_hook_exit();
+        }
+    case SUPERCALL_MINIMAL_HOOKS_STATUS:
+        return minimal_hooks_status();
+    case SUPERCALL_TARGET_HOOKS_STATUS:
+        return target_hooks_status();
+        
     default:
         break;
     }

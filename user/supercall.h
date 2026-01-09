@@ -196,4 +196,32 @@ static inline int sc_get_ap_mod_exclude(const char *key, uid_t uid)
     return exclude;
 }
 
+static inline int sc_minimal_syscall_hooks(const char *key, int enable)
+{
+    if (!key || !key[0]) return -EINVAL;
+    long ret = syscall(__NR_supercall, key, ver_and_cmd(key, SUPERCALL_MINIMAL_SYSCALL_HOOKS), (long)enable);
+    return ret;
+}
+
+static inline int sc_target_syscall_hooks(const char *key, int enable)
+{
+    if (!key || !key[0]) return -EINVAL;
+    long ret = syscall(__NR_supercall, key, ver_and_cmd(key, SUPERCALL_TARGET_SYSCALL_HOOKS), (long)enable);
+    return ret;
+}
+
+static inline int sc_minimal_hooks_status(const char *key)
+{
+    if (!key || !key[0]) return -EINVAL;
+    long ret = syscall(__NR_supercall, key, ver_and_cmd(key, SUPERCALL_MINIMAL_HOOKS_STATUS));
+    return ret;
+}
+
+static inline int sc_target_hooks_status(const char *key)
+{
+    if (!key || !key[0]) return -EINVAL;
+    long ret = syscall(__NR_supercall, key, ver_and_cmd(key, SUPERCALL_TARGET_HOOKS_STATUS));
+    return ret;
+}
+
 #endif

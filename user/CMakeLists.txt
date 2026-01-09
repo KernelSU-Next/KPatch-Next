@@ -21,6 +21,7 @@ set(SRCS
     kpatch.c
     kpm.c
     kpextension.c
+    rehook.c
 )
 
 add_library(kp STATIC ${SRCS})

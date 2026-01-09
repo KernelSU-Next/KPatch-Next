@@ -12,4 +12,7 @@ int minimal_hook_exit();
 int target_hook_init();
 int target_hook_exit();
 
+int minimal_hooks_status();
+int target_hooks_status();
+
 #endif

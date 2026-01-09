@@ -17,6 +17,7 @@
 #include "kpatch.h"
 #include "kpm.h"
 #include "kpextension.h"
+#include "rehook.h"
 
 char program_name[128] = { '\0' };
 const char *key = NULL;
@@ -39,13 +40,17 @@ static void usage(int status)
         fprintf(stdout,
                 "\n"
                 "Commands:\n"
-                "hello          If KPatch-Next installed, '%s' will echoed.\n"
-                "kpver          Print KPatch-Next version.\n"
-                "kver           Print Kernel version.\n"
-                "key            Manager the superkey.\n"
-                "kpm            KPatch-Next Module manager.\n"
-                "exclude_set    Manage the exclude list.\n"
-                "exclude_get    Get exclude list status.\n"
+                "hello                      If KPatch-Next installed, '%s' will echoed.\n"
+                "kpver                      Print KPatch-Next version.\n"
+                "kver                       Print Kernel version.\n"
+                "key                        Manager the superkey.\n"
+                "kpm                        KPatch-Next Module manager.\n"
+                "exclude_set                Manage the exclude list.\n"
+                "exclude_get                Get exclude list status.\n"
+                "rehook_minimal             Enable/disable minimal syscall hooks.\n"
+                "rehook_target              Enable/disable target syscall hooks.\n"
+                "rehook_minimal_status      Check minimal syscall hooks status.\n"
+                "rehook_target_status       Check target syscall hooks status.\n"
                 "\n",
                 SUPERCALL_HELLO_ECHO);
     }
@@ -93,6 +98,10 @@ int main(int argc, char **argv)
         { "kpm", 'k' },
         { "exclude_set", 'e' },
         { "exclude_get", 'g' },
+        { "rehook_minimal", 'm' },
+        { "rehook_target", 't' },
+        { "rehook_minimal_status", 'M' },
+        { "rehook_target_status", 'T' },
 
         { "bootlog", 'l' },
         { "panic", '.' },
@@ -133,6 +142,18 @@ int main(int argc, char **argv)
     case 'g':
         strcat(program_name, " exclude_get");
         return kpexclude_get_main(argc - 3, argv + 3);
+    case 'm':
+        strcat(program_name, " rehook_minimal");
+        return kprehook_minimal_main(argc - 3, argv + 3);
+    case 't':
+        strcat(program_name, " rehook_target");
+        return kprehook_target_main(argc - 3, argv + 3);
+    case 'M':
+        strcat(program_name, " rehook_minimal_status");
+        return kprehook_minimal_status_main(argc - 3, argv + 3);
+    case 'T':
+        strcat(program_name, " rehook_target_status");
+        return kprehook_target_status_main(argc - 3, argv + 3);
     case 'l':
         bootlog(key);
         break;

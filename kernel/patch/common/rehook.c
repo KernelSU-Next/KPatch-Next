@@ -14,6 +14,9 @@
 #define MIN_SYSCALL_NR 0
 #define MAX_SYSCALL_NR 451
 
+static int minimal_hooks_enabled = 0;
+static int target_hooks_enabled = 0;
+
 static const int native_skip_syscalls[] = {
     __NR_execve,
     __NR_execveat,
@@ -162,6 +165,8 @@ int minimal_hook_init(void)
     hook_native_syscalls(NULL, 0);
     hook_compat_syscalls(NULL, 0);
 
+    minimal_hooks_enabled = 1;
+
     logki("minimal_hook_init complete\n");
     return 0;
 }
@@ -173,6 +178,8 @@ int minimal_hook_exit(void)
 
     unhook_native_syscalls(NULL, 0);
     unhook_compat_syscalls(NULL, 0);
+
+    minimal_hooks_enabled = 0;
 
     logki("minimal_hook_exit complete\n");
     return 0;
@@ -186,6 +193,8 @@ int target_hook_init(void)
     hook_native_syscalls(target_native_syscalls, ARRAY_SIZE(target_native_syscalls));
     hook_compat_syscalls(target_compat_syscalls, ARRAY_SIZE(target_compat_syscalls));
 
+    target_hooks_enabled = 1;
+
     logki("target_hook_init complete\n");
     return 0;
 }
@@ -198,7 +207,21 @@ int target_hook_exit(void)
     unhook_native_syscalls(target_native_syscalls, ARRAY_SIZE(target_native_syscalls));
     unhook_compat_syscalls(target_compat_syscalls, ARRAY_SIZE(target_compat_syscalls));
 
+    target_hooks_enabled = 0;
+
     logki("target_hook_exit complete\n");
     return 0;
 }
 KP_EXPORT_SYMBOL(target_hook_exit);
+
+int minimal_hooks_status(void)
+{
+    return minimal_hooks_enabled;
+}
+KP_EXPORT_SYMBOL(minimal_hooks_status);
+
+int target_hooks_status(void)
+{
+    return target_hooks_enabled;
+}
+KP_EXPORT_SYMBOL(target_hooks_status);
