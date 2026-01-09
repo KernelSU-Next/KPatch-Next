@@ -8,225 +8,160 @@
 #include <stdlib.h>
 #include <error.h>
 #include <string.h>
+#include <errno.h>
 #include "supercall.h"
 
 extern const char *key;
 extern const char program_name[];
 
-static void minimal_usage(int status)
+static void rehook_usage(int status)
 {
     if (status != EXIT_SUCCESS)
-        fprintf(stderr, "Try `%s rehook_minimal help' for more information.\n", program_name);
+        fprintf(stderr, "Try `%s rehook help' for more information.\n", program_name);
     else {
-        printf("Usage: %s rehook_minimal <0|1>\n\n", program_name);
+        printf("Usage: %s rehook <0|1|2>\n\n", program_name);
         printf(
-            "Minimal syscall hooks command.\n\n"
+            "Syscall rehook mode command.\n\n"
             "help                 Print this help message.\n"
-            "1                    Enable minimal syscall hooks.\n"
-            "0                    Disable minimal syscall hooks.\n"
+            "0                    Disable rehook syscalls.\n"
+            "1                    Enable target syscall rehooks (specific syscalls only).\n"
+            "2                    Enable minimal syscall rehooks (all syscalls except whitelist).\n"
             "\n"
-            "Note: Cannot enable while target hooks are enabled.\n"
-            "See also: rehook_minimal_status\n"
+            "Note: Only one mode can be active at a time.\n"
+            "See also: rehook_status\n"
         );
     }
     exit(status);
 }
 
-static void target_usage(int status)
+static void rehook_status_usage(int status)
 {
     if (status != EXIT_SUCCESS)
-        fprintf(stderr, "Try `%s rehook_target help' for more information.\n", program_name);
+        fprintf(stderr, "Try `%s rehook_status help' for more information.\n", program_name);
     else {
-        printf("Usage: %s rehook_target <0|1>\n\n", program_name);
+        printf("Usage: %s rehook_status\n\n", program_name);
         printf(
-            "Target syscall hooks command.\n\n"
+            "Check syscall rehook mode status.\n\n"
             "help                 Print this help message.\n"
-            "1                    Enable target syscall hooks.\n"
-            "0                    Disable target syscall hooks.\n"
             "\n"
-            "Note: Cannot enable while minimal hooks are enabled.\n"
-            "See also: rehook_target_status\n"
+            "Returns:\n"
+            "  0 = All rehooks disabled\n"
+            "  1 = Target rehooks enabled\n"
+            "  2 = Minimal rehooks enabled\n"
         );
     }
     exit(status);
 }
 
-static void minimal_status_usage(int status)
+long set_rehook_mode(int mode)
 {
-    if (status != EXIT_SUCCESS)
-        fprintf(stderr, "Try `%s rehook_minimal_status help' for more information.\n", program_name);
-    else {
-        printf("Usage: %s rehook_minimal_status\n\n", program_name);
-        printf(
-            "Check minimal syscall hooks status.\n\n"
-            "help                 Print this help message.\n"
-            "\n"
-            "Returns: 0 = disabled, 1 = enabled\n"
-        );
+    if (mode < 0 || mode > 2)
+        error(-EINVAL, 0, "mode must be 0, 1, or 2");
+
+    long minimal_status = sc_minimal_hooks_status(key);
+    long target_status = sc_target_hooks_status(key);
+    
+    if (minimal_status < 0) {
+        printf("Error getting minimal rehooks status: %ld\n", minimal_status);
+        return minimal_status;
     }
-    exit(status);
-}
-
-static void target_status_usage(int status)
-{
-    if (status != EXIT_SUCCESS)
-        fprintf(stderr, "Try `%s rehook_target_status help' for more information.\n", program_name);
-    else {
-        printf("Usage: %s rehook_target_status\n\n", program_name);
-        printf(
-            "Check target syscall hooks status.\n\n"
-            "help                 Print this help message.\n"
-            "\n"
-            "Returns: 0 = disabled, 1 = enabled\n"
-        );
-    }
-    exit(status);
-}
-
-long set_minimal_hooks(int enable)
-{
-    if (enable != 0 && enable != 1)
-        error(-EINVAL, 0, "enable must be 0 or 1");
-
-    long current = sc_minimal_hooks_status(key);
-    if (current < 0) {
-        printf("Error getting current status: %ld\n", current);
-        return current;
+    if (target_status < 0) {
+        printf("Error getting target rehooks status: %ld\n", target_status);
+        return target_status;
     }
 
-    if (current == enable) {
-        printf("Minimal syscall hooks already %s\n",
-               enable ? "enabled" : "disabled");
+    int current_mode = 0;
+    if (minimal_status == 1) current_mode = 2;
+    else if (target_status == 1) current_mode = 1;
+
+    if (current_mode == mode) {
+        const char *mode_str[] = {"disabled", "target mode", "minimal mode"};
+        printf("Syscall rehooks already in mode %d (%s)\n", mode, mode_str[mode]);
         return 0;
     }
 
-    // If trying to enable, check if target hooks are enabled
-    if (enable == 1) {
-        long target_status = sc_target_hooks_status(key);
-        if (target_status < 0) {
-            printf("Error checking target hooks status: %ld\n", target_status);
-            return target_status;
+    long rc = 0;
+
+    if (current_mode == 2) {
+        rc = sc_minimal_syscall_hooks(key, 0);
+        if (rc < 0) {
+            printf("Error disabling minimal rehooks: %ld\n", rc);
+            return rc;
         }
-        if (target_status == 1) {
-            printf("Cannot enable minimal hooks: target hooks are currently enabled\n");
-            printf("Please disable target hooks first: %s rehook_target 0\n", program_name);
-            return -EBUSY;
+    } else if (current_mode == 1) {
+        rc = sc_target_syscall_hooks(key, 0);
+        if (rc < 0) {
+            printf("Error disabling target rehooks: %ld\n", rc);
+            return rc;
         }
     }
 
-    long rc = sc_minimal_syscall_hooks(key, enable);
-    if (rc < 0)
-        return rc;
-
-    printf("Minimal syscall hooks %s\n",
-           enable ? "enabled" : "disabled");
+    if (mode == 2) {
+        rc = sc_minimal_syscall_hooks(key, 1);
+        if (rc < 0) {
+            printf("Error enabling minimal rehooks: %ld\n", rc);
+            return rc;
+        }
+        printf("Syscall rehooks switched to mode 2 (minimal mode)\n");
+    } else if (mode == 1) {
+        rc = sc_target_syscall_hooks(key, 1);
+        if (rc < 0) {
+            printf("Error enabling target rehooks: %ld\n", rc);
+            return rc;
+        }
+        printf("Syscall rehooks switched to mode 1 (target mode)\n");
+    } else {
+        printf("Syscall rehooks switched to mode 0 (all rehooks disabled)\n");
+    }
 
     return rc;
 }
 
-long set_target_hooks(int enable)
+long get_rehook_status(void)
 {
-    if (enable != 0 && enable != 1)
-        error(-EINVAL, 0, "enable must be 0 or 1");
-
-    long current = sc_target_hooks_status(key);
-    if (current < 0) {
-        printf("Error getting current status: %ld\n", current);
-        return current;
-    }
-
-    if (current == enable) {
-        printf("Target syscall hooks already %s\n",
-               enable ? "enabled" : "disabled");
-        return 0;
-    }
-
-    // If trying to enable, check if minimal hooks are enabled
-    if (enable == 1) {
-        long minimal_status = sc_minimal_hooks_status(key);
-        if (minimal_status < 0) {
-            printf("Error checking minimal hooks status: %ld\n", minimal_status);
-            return minimal_status;
-        }
-        if (minimal_status == 1) {
-            printf("Cannot enable target hooks: minimal hooks are currently enabled\n");
-            printf("Please disable minimal hooks first: %s rehook_minimal 0\n", program_name);
-            return -EBUSY;
-        }
-    }
-
-    long rc = sc_target_syscall_hooks(key, enable);
-    if (rc < 0)
-        return rc;
-
-    printf("Target syscall hooks %s\n",
-           enable ? "enabled" : "disabled");
-
-    return rc;
-}
-
-long get_minimal_hooks_status(void)
-{
-    long rc = sc_minimal_hooks_status(key);
-    if (rc < 0) {
-        printf("Error getting minimal hooks status: %ld\n", rc);
-        return rc;
-    }
+    long minimal_status = sc_minimal_hooks_status(key);
+    long target_status = sc_target_hooks_status(key);
     
-    printf("Minimal syscall hooks: %s\n", rc ? "enabled" : "disabled");
-    return rc;
-}
-
-long get_target_hooks_status(void)
-{
-    long rc = sc_target_hooks_status(key);
-    if (rc < 0) {
-        printf("Error getting target hooks status: %ld\n", rc);
-        return rc;
+    if (minimal_status < 0) {
+        printf("Error getting minimal rehooks status: %ld\n", minimal_status);
+        return minimal_status;
     }
+    if (target_status < 0) {
+        printf("Error getting target rehooks status: %ld\n", target_status);
+        return target_status;
+    }
+
+    int mode = 0;
+    const char *mode_desc = "disabled";
     
-    printf("Target syscall hooks: %s\n", rc ? "enabled" : "disabled");
-    return rc;
+    if (minimal_status == 1) {
+        mode = 2;
+    } else if (target_status == 1) {
+        mode = 1;
+    }
+
+    printf("Syscall rehooks mode: %d\n", mode);
+    
+    return mode;
 }
 
-int kprehook_minimal_main(int argc, char **argv)
+int kprehook_main(int argc, char **argv)
 {
     if (argc != 1)
-        minimal_usage(EXIT_FAILURE);
+        rehook_usage(EXIT_FAILURE);
 
     if (!strcmp(argv[0], "help"))
-        minimal_usage(EXIT_SUCCESS);
+        rehook_usage(EXIT_SUCCESS);
 
-    int enable = atoi(argv[0]);
+    int mode = atoi(argv[0]);
 
-    return set_minimal_hooks(enable);
+    return set_rehook_mode(mode);
 }
 
-int kprehook_target_main(int argc, char **argv)
-{
-    if (argc != 1)
-        target_usage(EXIT_FAILURE);
-
-    if (!strcmp(argv[0], "help"))
-        target_usage(EXIT_SUCCESS);
-
-    int enable = atoi(argv[0]);
-
-    return set_target_hooks(enable);
-}
-
-int kprehook_minimal_status_main(int argc, char **argv)
+int kprehook_status_main(int argc, char **argv)
 {
     if (argc > 0 && !strcmp(argv[0], "help"))
-        minimal_status_usage(EXIT_SUCCESS);
+        rehook_status_usage(EXIT_SUCCESS);
     
-    return get_minimal_hooks_status();
-}
-
-int kprehook_target_status_main(int argc, char **argv)
-{
-    if (argc > 0 && !strcmp(argv[0], "help"))
-        target_status_usage(EXIT_SUCCESS);
-    
-    return get_target_hooks_status();
+    return get_rehook_status();
 }

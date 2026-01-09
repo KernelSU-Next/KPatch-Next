@@ -13,14 +13,11 @@
 extern "C" {
 #endif
 
-long set_minimal_hooks(int enable);
-long set_target_hooks(int enable);
+long set_rehook_mode(int mode);
+long get_rehook_status(void);
 
-int kprehook_minimal_main(int argc, char **argv);
-int kprehook_target_main(int argc, char **argv);
-
-int kprehook_minimal_status_main(int argc, char **argv);
-int kprehook_target_status_main(int argc, char **argv);
+int kprehook_main(int argc, char **argv);
+int kprehook_status_main(int argc, char **argv);
 
 #ifdef __cplusplus
 }
