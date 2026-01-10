@@ -20,7 +20,6 @@
 #include "rehook.h"
 
 char program_name[128] = { '\0' };
-const char *key = NULL;
 
 static void usage(int status)
 {
@@ -40,10 +39,9 @@ static void usage(int status)
         fprintf(stdout,
                 "\n"
                 "Commands:\n"
-                "hello              If KPatch-Next installed, '%s' will echoed.\n"
+                "hello              If KPatch-Next installed, '%s' will be echoed.\n"
                 "kpver              Print KPatch-Next version.\n"
                 "kver               Print Kernel version.\n"
-                "key                Manager the superkey.\n"
                 "kpm                KPatch-Next Module manager.\n"
                 "exclude_set        Manage the exclude list.\n"
                 "exclude_get        Get exclude list status.\n"
@@ -62,25 +60,7 @@ int main(int argc, char **argv)
 
     if (argc == 1) usage(EXIT_FAILURE);
 
-    key = argv[1];
-    strcat(program_name, " <SUPERKEY>");
-
-    if (argc == 2) {
-        if (!strcmp(argv[1], "-v") || !(strcmp(argv[1], "--version"))) {
-            fprintf(stdout, "%x\n", version());
-        } else if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
-            usage(EXIT_SUCCESS);
-        } else {
-            usage(EXIT_FAILURE);
-        }
-        return 0;
-    }
-
-    if (!key[0]) error(-EINVAL, 0, "invalid superkey");
-
-    if (strnlen(key, SUPERCALL_KEY_MAX_LEN) >= SUPERCALL_KEY_MAX_LEN) error(-EINVAL, 0, "superkey too long");
-
-    const char *scmd = argv[2];
+    const char *scmd = argv[1];
     int cmd = -1;
 
     struct
@@ -91,8 +71,7 @@ int main(int argc, char **argv)
         { "hello", SUPERCALL_HELLO },
         { "kpver", SUPERCALL_KERNELPATCH_VER },
         { "kver", SUPERCALL_KERNEL_VER },
-        { "key", 'K' },
-        { "su", 's' },
+        { "", 'K' },
         { "kpm", 'k' },
         { "exclude_set", 'e' },
         { "exclude_get", 'g' },
@@ -118,37 +97,34 @@ int main(int argc, char **argv)
 
     switch (cmd) {
     case SUPERCALL_HELLO:
-        hello(key);
+        hello();
         return 0;
     case SUPERCALL_KERNELPATCH_VER:
-        kpv(key);
+        kpv();
         return 0;
     case SUPERCALL_KERNEL_VER:
-        kv(key);
+        kv();
         return 0;
-    case 'K':
-        strcat(program_name, " key");
-        return skey_main(argc - 2, argv + 2);
     case 'k':
         strcat(program_name, " kpm");
-        return kpm_main(argc - 2, argv + 2);
+        return kpm_main(argc - 1, argv + 1);
     case 'e':
         strcat(program_name, " exclude_set");
-        return kpexclude_set_main(argc - 3, argv + 3);
+        return kpexclude_set_main(argc - 2, argv + 2);
     case 'g':
         strcat(program_name, " exclude_get");
-        return kpexclude_get_main(argc - 3, argv + 3);
+        return kpexclude_get_main(argc - 2, argv + 2);
     case 'r':
         strcat(program_name, " rehook");
-        return kprehook_main(argc - 3, argv + 3);
+        return kprehook_main(argc - 2, argv + 2);
     case 'q':
         strcat(program_name, " rehook_status");
-        return kprehook_status_main(argc - 3, argv + 3);
+        return kprehook_status_main(argc - 2, argv + 2);
     case 'l':
-        bootlog(key);
+        bootlog();
         break;
     case '.':
-        panic(key);
+        panic();
         break;
 
     case 'h':

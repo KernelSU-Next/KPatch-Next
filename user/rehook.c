@@ -11,7 +11,6 @@
 #include <errno.h>
 #include "supercall.h"
 
-extern const char *key;
 extern const char program_name[];
 
 static void rehook_usage(int status)
@@ -58,8 +57,8 @@ long set_rehook_mode(int mode)
     if (mode < 0 || mode > 2)
         error(-EINVAL, 0, "mode must be 0, 1, or 2");
 
-    long minimal_status = sc_minimal_hooks_status(key);
-    long target_status = sc_target_hooks_status(key);
+    long minimal_status = sc_minimal_hooks_status();
+    long target_status = sc_target_hooks_status();
     
     if (minimal_status < 0) {
         printf("Error getting minimal rehooks status: %ld\n", minimal_status);
@@ -83,13 +82,13 @@ long set_rehook_mode(int mode)
     long rc = 0;
 
     if (current_mode == 2) {
-        rc = sc_minimal_syscall_hooks(key, 0);
+        rc = sc_minimal_syscall_hooks(0);
         if (rc < 0) {
             printf("Error disabling minimal rehooks: %ld\n", rc);
             return rc;
         }
     } else if (current_mode == 1) {
-        rc = sc_target_syscall_hooks(key, 0);
+        rc = sc_target_syscall_hooks(0);
         if (rc < 0) {
             printf("Error disabling target rehooks: %ld\n", rc);
             return rc;
@@ -97,14 +96,14 @@ long set_rehook_mode(int mode)
     }
 
     if (mode == 2) {
-        rc = sc_minimal_syscall_hooks(key, 1);
+        rc = sc_minimal_syscall_hooks(1);
         if (rc < 0) {
             printf("Error enabling minimal rehooks: %ld\n", rc);
             return rc;
         }
         printf("Syscall rehooks switched to mode 2 (minimal mode)\n");
     } else if (mode == 1) {
-        rc = sc_target_syscall_hooks(key, 1);
+        rc = sc_target_syscall_hooks(1);
         if (rc < 0) {
             printf("Error enabling target rehooks: %ld\n", rc);
             return rc;
@@ -119,8 +118,8 @@ long set_rehook_mode(int mode)
 
 long get_rehook_status(void)
 {
-    long minimal_status = sc_minimal_hooks_status(key);
-    long target_status = sc_target_hooks_status(key);
+    long minimal_status = sc_minimal_hooks_status();
+    long target_status = sc_target_hooks_status();
     
     if (minimal_status < 0) {
         printf("Error getting minimal rehooks status: %ld\n", minimal_status);

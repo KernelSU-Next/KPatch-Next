@@ -12,37 +12,37 @@
 #include "kpm.h"
 #include "supercall.h"
 
-int kpm_load(const char *key, const char *path, const char *args)
+int kpm_load(const char *path, const char *args)
 {
-    int rc = sc_kpm_load(key, path, args, 0);
+    int rc = sc_kpm_load(path, args, 0);
     return rc;
 }
 
-int kpm_control(const char *key, const char *name, const char *ctl_args)
+int kpm_control(const char *name, const char *ctl_args)
 {
     char buf[4096] = { '\0' };
-    int rc = sc_kpm_control(key, name, ctl_args, buf, sizeof(buf));
+    int rc = sc_kpm_control(name, ctl_args, buf, sizeof(buf));
     fprintf(stdout, "%s", buf);
     return rc;
 }
 
-int kpm_unload(const char *key, const char *name)
+int kpm_unload(const char *name)
 {
-    int rc = sc_kpm_unload(key, name, 0);
+    int rc = sc_kpm_unload(name, 0);
     return rc;
 }
 
-int kpm_nums(const char *key)
+int kpm_nums()
 {
-    int nums = sc_kpm_nums(key);
+    int nums = sc_kpm_nums();
     fprintf(stdout, "%d\n", nums);
     return 0;
 }
 
-int kpm_list(const char *key)
+int kpm_list()
 {
     char buf[4096];
-    int rc = sc_kpm_list(key, buf, sizeof(buf));
+    int rc = sc_kpm_list(buf, sizeof(buf));
     if (rc > 0) {
         fprintf(stdout, "%s", buf);
         return 0;
@@ -50,10 +50,10 @@ int kpm_list(const char *key)
     return rc;
 }
 
-int kpm_info(const char *key, const char *name)
+int kpm_info(const char *name)
 {
     char buf[4096];
-    int rc = sc_kpm_info(key, name, buf, sizeof(buf));
+    int rc = sc_kpm_info(name, buf, sizeof(buf));
     if (rc > 0) {
         fprintf(stdout, "%s", buf);
         return 0;
@@ -62,7 +62,6 @@ int kpm_info(const char *key, const char *name)
 }
 
 extern const char program_name[];
-extern const char *key;
 
 static void usage(int status)
 {
@@ -124,25 +123,25 @@ int kpm_main(int argc, char **argv)
         if (argc < 3) error(-EINVAL, 0, "module path does not exist");
         path = argv[2];
         mod_args = argc < 4 ? NULL : argv[3];
-        return kpm_load(key, path, mod_args);
+        return kpm_load(path, mod_args);
     case SUPERCALL_KPM_CONTROL:
         if (argc < 3) error(-EINVAL, 0, "module name does not exist");
         if (argc < 4) error(-EINVAL, 0, "control argument does not exist");
         name = argv[2];
         ctl_args = argv[3];
-        return kpm_control(key, name, ctl_args);
+        return kpm_control(name, ctl_args);
     case SUPERCALL_KPM_UNLOAD:
         if (argc < 3) error(-EINVAL, 0, "module name does not exist");
         name = argv[2];
-        return kpm_unload(key, name);
+        return kpm_unload(name);
     case SUPERCALL_KPM_NUMS:
-        return kpm_nums(key);
+        return kpm_nums();
     case SUPERCALL_KPM_LIST:
-        return kpm_list(key);
+        return kpm_list();
     case SUPERCALL_KPM_INFO:
         if (argc < 3) error(-EINVAL, 0, "module name does not exist");
         name = argv[2];
-        return kpm_info(key, name);
+        return kpm_info(name);
     case 0:
         usage(EXIT_SUCCESS);
     default:

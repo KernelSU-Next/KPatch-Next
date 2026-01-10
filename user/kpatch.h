@@ -17,14 +17,12 @@ extern "C"
 
     uint32_t version();
 
-    void hello(const char *key);
-    void kpv(const char *key);
-    void kv(const char *key);
+    void hello();
+    void kpv();
+    void kv();
 
-    int skey_main(int argc, char **argv);
-
-    void bootlog(const char *key);
-    void panic(const char *key);
+    void bootlog();
+    void panic();
 
 #ifdef __cplusplus
 }
