@@ -9,6 +9,7 @@
 #include <symbol.h>
 #include <supercall.h>
 #include <linux/printk.h>
+#include <kputils.h>
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 #define MIN_SYSCALL_NR 0
@@ -53,15 +54,19 @@ static const int target_compat_syscalls[] = {
     96
 };
 
-static void minimal_before(hook_fargs6_t *args, void *udata)
+static void minimal_before(hook_fargs0_t *args, void *udata)
 {
-    // just a palceholder to not use main before()
+    if (current_uid() != 0u) // only allow root 
+        return;
+        
     return;
 }
 
-static void target_before(hook_fargs6_t *args, void *udata)
+static void target_before(hook_fargs0_t *args, void *udata)
 {
-    // just a palceholder to not use main before()
+    if (current_uid() != 0u) // only allow root 
+        return;
+        
     return;
 }
 
@@ -74,7 +79,7 @@ static inline bool syscall_is_skipped(int nr, const int *list, size_t count)
     return false;
 }
 
-static void hook_native_syscalls(const int *syscalls, size_t count, void (*callback)(hook_fargs6_t *, void *))
+static void hook_native_syscalls(const int *syscalls, size_t count, void (*callback)(hook_fargs0_t *, void *))
 {
     logki("hook_native_syscalls start\n");
 
@@ -96,7 +101,7 @@ static void hook_native_syscalls(const int *syscalls, size_t count, void (*callb
     logki("hook_native_syscalls done\n");
 }
 
-static void unhook_native_syscalls(const int *syscalls, size_t count, void (*callback)(hook_fargs6_t *, void *))
+static void unhook_native_syscalls(const int *syscalls, size_t count, void (*callback)(hook_fargs0_t *, void *))
 {
     logki("unhook_native_syscalls start\n");
 
@@ -119,7 +124,7 @@ static void unhook_native_syscalls(const int *syscalls, size_t count, void (*cal
 }
 
 /* ---------------- Compat ---------------- */
-static void hook_compat_syscalls(const int *syscalls, size_t count, void (*callback)(hook_fargs6_t *, void *))
+static void hook_compat_syscalls(const int *syscalls, size_t count, void (*callback)(hook_fargs0_t *, void *))
 {
     if (!has_config_compat || !compat_sys_call_table)
         return;
@@ -144,7 +149,7 @@ static void hook_compat_syscalls(const int *syscalls, size_t count, void (*callb
     logki("hook_compat_syscalls done\n");
 }
 
-static void unhook_compat_syscalls(const int *syscalls, size_t count, void (*callback)(hook_fargs6_t *, void *))
+static void unhook_compat_syscalls(const int *syscalls, size_t count, void (*callback)(hook_fargs0_t *, void *))
 {
     if (!has_config_compat || !compat_sys_call_table)
         return;
