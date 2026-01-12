@@ -181,26 +181,16 @@ static long supercall(long cmd, long arg1, long arg2, long arg3, long arg4)
     }
 
     switch (cmd) {
-    case SUPERCALL_MINIMAL_SYSCALL_HOOKS:
+    case SUPERCALL_REHOOK_SYSCALL:
         {
             int enable = (int)arg1;
             if (enable)
-                return minimal_hook_init();
+                return rehook_init();
             else
-                return minimal_hook_exit();
+                return rehook_exit();
         }
-    case SUPERCALL_TARGET_SYSCALL_HOOKS:
-        {
-            int enable = (int)arg1;
-            if (enable)
-                return target_hook_init();
-            else
-                return target_hook_exit();
-        }
-    case SUPERCALL_MINIMAL_HOOKS_STATUS:
-        return minimal_hooks_status();
-    case SUPERCALL_TARGET_HOOKS_STATUS:
-        return target_hooks_status();
+    case SUPERCALL_REHOOK_STATUS:
+        return rehook_status();
     }
 
     switch (cmd) {

@@ -135,24 +135,14 @@ static inline int sc_get_ap_mod_exclude(uid_t uid)
     return exclude;
 }
 
-static inline int sc_minimal_syscall_hooks(int enable)
+static inline int sc_rehook_syscall(int enable)
 {
-    return syscall(__NR_supercall, NULL, ver_and_cmd(SUPERCALL_MINIMAL_SYSCALL_HOOKS), (long)enable);
+    return syscall(__NR_supercall, NULL, ver_and_cmd(SUPERCALL_REHOOK_SYSCALL), (long)enable);
 }
 
-static inline int sc_target_syscall_hooks(int enable)
+static inline int sc_rehook_status(void)
 {
-    return syscall(__NR_supercall, NULL, ver_and_cmd(SUPERCALL_TARGET_SYSCALL_HOOKS), (long)enable);
-}
-
-static inline int sc_minimal_hooks_status(void)
-{
-    return syscall(__NR_supercall, NULL, ver_and_cmd(SUPERCALL_MINIMAL_HOOKS_STATUS));
-}
-
-static inline int sc_target_hooks_status(void)
-{
-    return syscall(__NR_supercall, NULL, ver_and_cmd(SUPERCALL_TARGET_HOOKS_STATUS));
+    return syscall(__NR_supercall, NULL, ver_and_cmd(SUPERCALL_REHOOK_STATUS));
 }
 
 #endif

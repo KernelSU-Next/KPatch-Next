@@ -6,13 +6,9 @@
 #ifndef _KP_REHOOK_H_
 #define _KP_REHOOK_H_
 
-int minimal_hook_init();
-int minimal_hook_exit();
+int rehook_init();
+int rehook_exit();
 
-int target_hook_init();
-int target_hook_exit();
-
-int minimal_hooks_status();
-int target_hooks_status();
+int rehook_status();
 
 #endif

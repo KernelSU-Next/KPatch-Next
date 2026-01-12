@@ -45,8 +45,8 @@ static void usage(int status)
                 "kpm                KPatch-Next Module manager.\n"
                 "exclude_set        Manage the exclude list.\n"
                 "exclude_get        Get exclude list status.\n"
-                "rehook             Set syscall rehooks mode (0=off, 1=target, 2=minimal).\n"
-                "rehook_status      Check current syscall rehooks mode.\n"
+                "rehook             Set rehook mode (0=off, 1=target, 2=minimal).\n"
+                "rehook_status      Check current rehook mode.\n"
                 "\n",
                 SUPERCALL_HELLO_ECHO);
     }

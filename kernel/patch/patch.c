@@ -51,7 +51,7 @@ void module_init();
 void syscall_init();
 int kstorage_init();
 int kpextension_init();
-int target_hook_init();
+int rehook_init();
 
 static void before_rest_init(hook_fargs4_t *args, void *udata)
 {
@@ -82,8 +82,8 @@ static void before_rest_init(hook_fargs4_t *args, void *udata)
     rc = resolve_pt_regs();
     log_boot("resolve_pt_regs done: %d\n", rc);
 
-    rc = target_hook_init();
-    log_boot("target_hook_init done: %d\n", rc);
+    rc = rehook_init();
+    log_boot("rehook_init done: %d\n", rc);
 
 out:
     return;
