@@ -7,3 +7,5 @@ build
 
 test
 script
+
+*.zip
