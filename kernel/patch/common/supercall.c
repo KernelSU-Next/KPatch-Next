@@ -100,7 +100,7 @@ static long call_kpm_nums()
 static long call_kpm_list(char *__user names, int len)
 {
     if (len <= 0) return -EINVAL;
-    char buf[4096];
+    char buf[4096] = {0};
     int sz = list_modules(buf, sizeof(buf));
     if (sz > len) return -ENOBUFS;
     sz = compat_copy_to_user(names, buf, len);

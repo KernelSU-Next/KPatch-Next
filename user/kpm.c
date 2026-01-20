@@ -41,7 +41,7 @@ int kpm_nums()
 
 int kpm_list()
 {
-    char buf[4096];
+    char buf[4096] = {0};
     int rc = sc_kpm_list(buf, sizeof(buf));
     if (rc > 0) {
         fprintf(stdout, "%s", buf);
