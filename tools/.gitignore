@@ -27,6 +27,5 @@ build/*
 
 preset.h
 kptools
-
-# 
+kptools.exe
 build_android.sh
